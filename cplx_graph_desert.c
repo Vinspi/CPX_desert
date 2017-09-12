@@ -42,7 +42,7 @@ void initGraph(Graph_m *g, int n){
 }
 
 
-/* Fonction printGraph : écrit la représentation matricielle du graphe dans un fichier
+/* 	Fonction printGraph : écrit la représentation matricielle du graphe dans un fichier
 	[Param IN]	char *filename : le nom du fichier dans lequel écrire  
 	[Param IN]	Graph_m *g : pointeur vers la structure reprensentant le graphe en mémoire */
 
