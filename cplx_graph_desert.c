@@ -121,7 +121,7 @@ int main(void){
 
 	Graph_m *graph = malloc(sizeof(Graph_m));
 
-	liste sous_graphe_desert = NULL, tmp;
+	liste sous_graphe_desert = NULL, sous_graphe_desert_maximal = NULL, tmp;
 
 	tmp = malloc(sizeof(liste));
 	tmp->st = 0;
@@ -147,6 +147,10 @@ int main(void){
 	sous_graphe_desert = sous_graphe_maximal(graph, sous_graphe_desert);
 
 	printf_liste(sous_graphe_desert);
+
+	sous_graphe_desert_maximal = sous_graphe_maximal_incomplete(graph, sous_graphe_desert_maximal);
+
+	printf_liste(sous_graphe_desert_maximal);
 
 	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert));
 
@@ -297,4 +301,94 @@ void printf_liste(liste x){
     }
     printf("]\n");
 		printf("taille : %d\n",acc);
+}
+
+int copie_tab(int source[], int dest[], int n){
+	for(int i=0;i<n;i++){
+		dest[i] = source[i];
+	}
+}
+
+int sommet_deg_minimum(int degre[], int n){
+	int min=degre[0], indice_min = 0;
+	for(int i=0;i<n;i++)
+		if(min != -1 && min > degre[i]){
+			min = degre[i];
+			indice_min = i;
+		}
+	if(degre[indice_min] == -1)
+		return -1;
+	return indice_min;
+}
+
+/*
+	cette fonction va renvoyer un sommet que l'on pourra ajouter à notre
+	sous-graphe désert en conservant ses propriétés, ce sommet sera de
+	degrès minimum et -1 si x est maximal
+*/
+
+int sommet_a_ajouter_degres_minimum(Graph_m *g, liste x, int degres[]){
+
+	int sommet_deg_min;
+	liste tmp_parcour = x;
+
+	while (tmp_parcour != NULL) {
+		/* on enleve tous ses sommets adjacents */
+		for(int i=0;i<g->n;i++){
+			if(g->a[tmp_parcour->st][i]){
+				degres[i] = -1;
+			}
+		}
+		tmp_parcour = tmp_parcour -> suiv;
+	}
+
+	/* on recherche une valeur positive, si on en trouve une cela signifie que
+		 le sous graphe n'est pas maximal puisque nous pouvons ajouter au moins
+		 un sommet au sous-graphe sans perdre sa propriété de sous-graphe desert.
+		 on renvoie donc le sommet que l'on peut ajouter.
+	*/
+	sommet_deg_min = sommet_deg_minimum(degres, g->n);
+
+
+	return sommet_deg_min;
+
+}
+
+sous_graphe_maximal_incomplete(Graph_m *g, liste sous_graphe_desert){
+
+	liste tmp;
+	int degres[g->n];
+	/* on réalise une copie de degres contenu dns le graphe */
+	copie_tab(g->degre, degres, g->n);
+
+	for(int i=0;i<g->n;i++)
+		printf("%d ", degres[i]);
+	printf("\n");
+
+	/* initialisation de la liste de sommet avec le sommet de degres minimum*/
+	int sommet_potentiel = sommet_deg_minimum(degres, g->n);
+	printf("sommet deg mini init : %d\n", sommet_potentiel);
+	degres[sommet_potentiel] = -1;
+
+	sous_graphe_desert = malloc(sizeof(liste));
+	sous_graphe_desert->st = sommet_potentiel;
+	sous_graphe_desert->suiv = NULL;
+
+	do{
+		for(int i=0;i<g->n;i++)
+			printf("%d ", degres[i]);
+		printf("\n");
+
+		sommet_potentiel = sommet_a_ajouter_degres_minimum(g,sous_graphe_desert,degres);
+		printf("sommet potentiel : %d\n", sommet_potentiel);
+		if(sommet_potentiel >= 0){
+			tmp = malloc(sizeof(liste));
+			tmp->st=sommet_potentiel;
+			tmp->suiv=sous_graphe_desert;
+			sous_graphe_desert=tmp;
+		}
+	}while(sommet_potentiel >= 0);
+
+	return sous_graphe_desert;
+
 }
