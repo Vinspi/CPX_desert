@@ -300,15 +300,15 @@ void sommet_degre_min(Graph_m *g, sous_graphe_max *xs){
 			min = g->degre[i];
 			//free_liste(x);
 			free(x);
-			x = add_to_liste(x, imin);		
+			lx = add_to_liste(lx, imin);		
 			xs->taille = 1;
 		}
 		if(g->degre[i] == min){
-			x = add_to_liste(x, imin);		
+			lx = add_to_liste(x, imin);		
 			xs->taille = (xs->taille) + 1;
 		}
 	}
-	xs->lx = x;
+	//xs->lx = x;
 	return xs;
 }
 

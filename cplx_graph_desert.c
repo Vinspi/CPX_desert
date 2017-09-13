@@ -140,7 +140,7 @@ int main(void){
 	tmp->suiv = sous_graphe_desert;
 	sous_graphe_desert = tmp;
 
-	loadSource("./graph/Benchs/tr5", graph);
+	loadSource("./anna", graph);
 
 	//printGraph("./matri_graph", graph);
 
