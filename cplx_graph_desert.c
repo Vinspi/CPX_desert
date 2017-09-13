@@ -24,7 +24,7 @@ typedef struct maillon{
 
 typedef maillon *liste;
 
-
+liste sous_graphe_maximal(Graph_m *g, liste sous_graphe_desert);
 
 /*	Fontion initGraphe : initialise les champs de la structure representant le graphe en mémoire
 	[Param IN]	Graph_m *g : pointeur vers la structure reprensentant le graphe en mémoire */
@@ -100,7 +100,7 @@ void loadSource(char* filename, Graph_m *g){
 
 	initGraph(g, nbSt);
 
-    printf("Nombre de sommets : %d\n", nbSt);
+  printf("Nombre de sommets : %d\n", nbSt);
 	printf("Nombre d'aretes : %d\n", nbAr);
 
 	while(fscanf(source, "%s %s", from_str, to_str) != EOF){
@@ -111,8 +111,7 @@ void loadSource(char* filename, Graph_m *g){
 		g->a[to][from] = 1;
 		g->degre[from] = g->degre[from] + 1;
 
-		printf("( %d,", from);
-		printf(" %d )\n", to);
+
 	}
 
 	fclose(source);
@@ -139,13 +138,20 @@ int main(void){
 	tmp->suiv = sous_graphe_desert;
 	sous_graphe_desert = tmp;
 
-	loadSource("./source_graph", graph);
+	loadSource("./graph/Benchs/tr5", graph);
 
 	//printGraph("./matri_graph", graph);
+
+
+
+	sous_graphe_desert = sous_graphe_maximal(graph, sous_graphe_desert);
+
+	printf_liste(sous_graphe_desert);
 
 	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert));
 
 	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sous_graphe_desert));
+
 	return 0;
 }
 
@@ -210,4 +216,85 @@ int verification_maximalite(Graph_m *g, liste x){
 				return 0;
 
 	return 1;
+}
+
+/*
+	cette fonction va renvoyer un sommet que l'on pourra ajouter à notre
+	sous-graphe désert en conservant ses propriétés et -1 si x est maximal
+*/
+
+int sommet_a_ajouter(Graph_m *g, liste x){
+
+	int tableau_adjacence[n_max];
+	liste tmp_parcour = x;
+
+	for(int i=0;i<g->n;i++)
+		tableau_adjacence[i] = 1;
+
+	while (tmp_parcour != NULL) {
+		/* on retire le sommet courant des adjacents */
+		tableau_adjacence[tmp_parcour->st] = 0;
+		/* on retire ensuite tous ses sommets adjacents */
+		for(int i=0;i<g->n;i++){
+			if(g->a[tmp_parcour->st][i])
+				tableau_adjacence[i] = 0;
+		}
+		tmp_parcour = tmp_parcour -> suiv;
+	}
+
+	/* on recherche une valeur positive, si on en trouve une cela signifie que
+		 le sous graphe n'est pas maximal puisque nous pouvons ajouter au moins
+		 un sommet au sous-graphe sans perdre sa propriété de sous-graphe desert.
+		 on renvoie donc le sommet que l'on peut ajouter.
+	*/
+
+	for(int i=0;i<g->n;i++)
+	  	if(tableau_adjacence[i])
+				return i;
+
+	return -1;
+}
+
+/*
+	fonction permettant de trouver une liste de sommets formant
+	un sous graphe désert maximal de g
+*/
+
+liste sous_graphe_maximal(Graph_m *g, liste sous_graphe_desert){
+
+	liste tmp;
+	int sommet_potentiel;
+
+	/* initialisation de la liste de sommet avec le 1er sommet */
+	sous_graphe_desert = malloc(sizeof(liste));
+	sous_graphe_desert->st = 0;
+	sous_graphe_desert->suiv = NULL;
+
+	do{
+		sommet_potentiel = sommet_a_ajouter(g,sous_graphe_desert);
+		if(sommet_potentiel >= 0){
+			tmp = malloc(sizeof(liste));
+			tmp->st=sommet_potentiel;
+			tmp->suiv=sous_graphe_desert;
+			sous_graphe_desert=tmp;
+		}
+	}while(sommet_potentiel > 0);
+
+	return sous_graphe_desert;
+}
+
+/* fonction utilitaire permettant d'afficher une liste */
+
+void printf_liste(liste x){
+
+    liste tmp = x;
+		int acc = 0;
+    printf("[ ");
+    while(tmp != NULL){
+        printf("%d ",tmp->st);
+        tmp = tmp->suiv;
+				acc++;
+    }
+    printf("]\n");
+		printf("taille : %d\n",acc);
 }
