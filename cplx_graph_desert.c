@@ -119,21 +119,77 @@ void loadSource(char* filename, Graph_m *g){
 	fclose(source);	
 }
 
+//Affichage liste x.
+void printf_liste(liste x){
+
+	liste tmp = x;
+	printf("[ ");
+	while(tmp != NULL){
+		printf("%d ",tmp->st);
+		tmp = tmp->suiv;
+	}
+	printf("]\n");
+}
+
+//Ajoute un sommet a à la liste x.
+liste add_to_liste(liste x, sommet a){
+	liste tmp = malloc(sizeof(liste));
+	tmp->st = a;
+	tmp->suiv = x;
+	return tmp;
+}
+
+//Approche naïve : double boucle complète -> comparaisons faites deux fois. Retourne 1 si desert, 0 sinon.
+int verification_graphe_desert(Graph_m *g, liste x){
+
+	liste tmp = x, tmp2 = x;
+	int i = 1;
+
+	while(tmp != NULL && i == 1){
+		while(tmp2 != NULL && i == 1){
+			if(g->a[tmp->st][tmp2->st] == 1) i = 0;
+			tmp2 = tmp2->suiv; 
+		}
+		tmp = tmp->suiv;
+		tmp2 = x;
+	}
+
+	return i;
+}
+
+
+
+
+
 int main(void){
 
 	Graph_m *graph = malloc(sizeof(Graph_m));
  
 	loadSource("./source_graph", graph);
 	
-	printGraph("./matri_graph", graph);
+	//printGraph("./matri_graph", graph);
 	
+	liste x;
+	x = add_to_liste(x, 0);
+	x = add_to_liste(x, 2);
+	x = add_to_liste(x, 4);	
+	//x = add_to_liste(x, 3);
+	printf_liste(x);
+
+	if(verification_graphe_desert(graph, x) == 1) printf("x est un sous-graphe desert de g\n");
+	else printf("x n'est pas un sous-graphe desert de g\n");
+
 	return 0;
 }
 
 
-int verification_graphe_desert(liste x){
 
 
 
-	return 0;
-}
+
+
+
+
+
+
+
