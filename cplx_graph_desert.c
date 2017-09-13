@@ -145,43 +145,6 @@ liste add_to_liste(liste x, sommet a){
 
 
 
-int main(void){
-
-	Graph_m *graph = malloc(sizeof(Graph_m));
-
-	liste sous_graphe_desert = NULL, tmp;
-
-	tmp = malloc(sizeof(liste));
-	tmp->st = 0;
-	tmp->suiv = sous_graphe_desert;
-	sous_graphe_desert = tmp;
-
-	tmp = malloc(sizeof(liste));
-	tmp->st = 4;
-	tmp->suiv = sous_graphe_desert;
-	sous_graphe_desert = tmp;
-
-	tmp = malloc(sizeof(liste));
-	tmp->st = 2;
-	tmp->suiv = sous_graphe_desert;
-	sous_graphe_desert = tmp;
-
-	loadSource("./source_graph", graph);
-
-
-	//printGraph("./matri_graph", graph);
-
-	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert));
-
-
-	return 0;
-}
-
-/*
-	 permet de verifier si la liste x est un sous graphe désert de g
-	 la fonction renvoie 1 si c'est le cas  sinon
-*/
-
 
 int verification_graphe_desert(Graph_m *g, liste x){
 
@@ -202,12 +165,71 @@ int verification_graphe_desert(Graph_m *g, liste x){
 	return resultat;
 }
 
+
+
+//Approche par tableau.
+void generer_tableau_all(Graph_m *g, int* tab){
+	for(int i = 0; i < g->n; i++){
+		tab[i] = 1;
+	}
+
+}
+
+
+void retirer_adjacence(Graph_m *g, liste x, int* tab){
+	liste tmp = x;
+	while(tmp != NULL){
+		tab[tmp->st] = 0;					//Retrait des sommets de la liste.
+		for(int i = 0; i < g->n; i++){
+			if(g->a[tmp->st][i] == 1) tab[i] = 0;		//Retrait des sommets adjacents aux sommets de la liste
+		}
+		tmp = tmp->suiv;
+	}
+}
+
+//Retourne 0 si la l'adjancence est nulle, 1 sinon.
+int verif_all(Graph_m *g, int* tab){
+
+	for(int i = 0; i < g->n; i++){
+		if(tab[i] == 1) return 1;
+	}
+	return 0;
+
+}
+
+//Retourne 0 si maximal, 1 sinon.
 int verification_maximalite(Graph_m *g, liste x){
+	int all[n_max]; 
+	generer_tableau_all(g, all);
+	
+	retirer_adjacence(g, x, all);
+	return verif_all(g, all);
+
+}
 
 
 
 
+int main(void){
 
+	Graph_m *graph = malloc(sizeof(Graph_m));
+ 
+	loadSource("./source_graph", graph);
+	
+	//printGraph("./matri_graph", graph);
+	
+	liste x;
+	x = add_to_liste(x, 0);
+	x = add_to_liste(x, 2);
+	x = add_to_liste(x, 4);	
+	//x = add_to_liste(x, 3);
+	printf_liste(x);
 
+	if(verification_graphe_desert(graph, x) == 1) printf("x est un sous-graphe desert de g\n");
+	else printf("x n'est pas un sous-graphe desert de g\n");
 
+	printf("%d\n",verification_maximalite(graph, x));
+
+	return 0;
+}
 
