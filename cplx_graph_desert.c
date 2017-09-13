@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 
 /*	Liste des codes d'erreur
@@ -110,6 +111,7 @@ void loadSource(char* filename, Graph_m *g){
 		g->a[from][to] = 1;
 		g->a[to][from] = 1;
 		g->degre[from] = g->degre[from] + 1;
+		g->degre[to] = g->degre[from] +1;
 
 
 	}
@@ -152,9 +154,9 @@ int main(void){
 
 	printf_liste(sous_graphe_desert_maximal);
 
-	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert));
+	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert_maximal));
 
-	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sous_graphe_desert));
+	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sous_graphe_desert_maximal));
 
 	return 0;
 }
@@ -302,6 +304,9 @@ void printf_liste(liste x){
     printf("]\n");
 		printf("taille : %d\n",acc);
 }
+/*
+	fonction utilitaire de copie de tableau
+*/
 
 int copie_tab(int source[], int dest[], int n){
 	for(int i=0;i<n;i++){
@@ -309,14 +314,20 @@ int copie_tab(int source[], int dest[], int n){
 	}
 }
 
+/*
+	cette fonction choisit l'indice du sommet ayant un degres minimum
+	en ignorant les valeurs négatives
+*/
+
 int sommet_deg_minimum(int degre[], int n){
-	int min=degre[0], indice_min = 0;
+	int min=INT_MAX, indice_min = 0;
 	for(int i=0;i<n;i++)
-		if(min != -1 && min > degre[i]){
+		if(degre[i] > -1 && min > degre[i]){
 			min = degre[i];
 			indice_min = i;
 		}
-	if(degre[indice_min] == -1)
+	//printf("min : %d\n", min);
+	if(min == INT_MAX)
 		return -1;
 	return indice_min;
 }
@@ -327,20 +338,23 @@ int sommet_deg_minimum(int degre[], int n){
 	degrès minimum et -1 si x est maximal
 */
 
-int sommet_a_ajouter_degres_minimum(Graph_m *g, liste x, int degres[]){
+int sommet_a_ajouter_degres_minimum(Graph_m *g, int dernier_sommet_ajoute, int degres[]){
 
 	int sommet_deg_min;
-	liste tmp_parcour = x;
 
-	while (tmp_parcour != NULL) {
-		/* on enleve tous ses sommets adjacents */
-		for(int i=0;i<g->n;i++){
-			if(g->a[tmp_parcour->st][i]){
-				degres[i] = -1;
-			}
+
+
+	/* on enleve tous ses sommets adjacents */
+	for(int i=0;i<g->n;i++){
+		if(g->a[dernier_sommet_ajoute][i]){
+			degres[i] = -1;
+			for(int j=0;j<g->n;j++)
+				if(g->a[i][j]){
+					degres[j] = degres[j] - 1;
+				}
 		}
-		tmp_parcour = tmp_parcour -> suiv;
 	}
+
 
 	/* on recherche une valeur positive, si on en trouve une cela signifie que
 		 le sous graphe n'est pas maximal puisque nous pouvons ajouter au moins
@@ -354,6 +368,11 @@ int sommet_a_ajouter_degres_minimum(Graph_m *g, liste x, int degres[]){
 
 }
 
+/*
+	fonction trouvant une liste correspondant a un sous-graphe desert maximal
+	de longeur approchant celle du sous-graphe maximum de g grâce à une heuristique
+*/
+
 sous_graphe_maximal_incomplete(Graph_m *g, liste sous_graphe_desert){
 
 	liste tmp;
@@ -361,9 +380,6 @@ sous_graphe_maximal_incomplete(Graph_m *g, liste sous_graphe_desert){
 	/* on réalise une copie de degres contenu dns le graphe */
 	copie_tab(g->degre, degres, g->n);
 
-	for(int i=0;i<g->n;i++)
-		printf("%d ", degres[i]);
-	printf("\n");
 
 	/* initialisation de la liste de sommet avec le sommet de degres minimum*/
 	int sommet_potentiel = sommet_deg_minimum(degres, g->n);
@@ -375,17 +391,15 @@ sous_graphe_maximal_incomplete(Graph_m *g, liste sous_graphe_desert){
 	sous_graphe_desert->suiv = NULL;
 
 	do{
-		for(int i=0;i<g->n;i++)
-			printf("%d ", degres[i]);
-		printf("\n");
 
-		sommet_potentiel = sommet_a_ajouter_degres_minimum(g,sous_graphe_desert,degres);
-		printf("sommet potentiel : %d\n", sommet_potentiel);
+
+		sommet_potentiel = sommet_a_ajouter_degres_minimum(g,sous_graphe_desert->st,degres);
 		if(sommet_potentiel >= 0){
 			tmp = malloc(sizeof(liste));
 			tmp->st=sommet_potentiel;
 			tmp->suiv=sous_graphe_desert;
 			sous_graphe_desert=tmp;
+			degres[sommet_potentiel] = -1;
 		}
 	}while(sommet_potentiel >= 0);
 
