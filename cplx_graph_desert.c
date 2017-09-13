@@ -147,13 +147,13 @@ int main(void){
 
 	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert));
 
-
+	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sous_graphe_desert));
 	return 0;
 }
 
 /*
 	 permet de verifier si la liste x est un sous graphe désert de g
-	 la fonction renvoie 1 si c'est le cas  sinon
+	 la fonction renvoie 1 si c'est le cas  sinon.
 */
 
 int verification_graphe_desert(Graph_m *g, liste x){
@@ -174,7 +174,42 @@ int verification_graphe_desert(Graph_m *g, liste x){
 	return resultat;
 }
 
+/*
+	permet de verifier la maximalité d'un sous graphe désert de g
+	la fonction renvoie 1 si le ous graphe passé en parametre est maximal et 0 sinon.
+*/
+
 int verification_maximalite(Graph_m *g, liste x){
 
-	return 0;
+	int tableau_adjacence[n_max];
+	liste tmp_parcour = x;
+
+	/* si ce n'est pas un sous graphe desert de g il ne peut etre maximal */
+	if(!verification_graphe_desert(g,x))
+		return 0;
+
+		for(int i=0;i<g->n;i++)
+			tableau_adjacence[i] = 1;
+
+	while (tmp_parcour != NULL) {
+		/* on retire le sommet courant des adjacents */
+		tableau_adjacence[tmp_parcour->st] = 0;
+		/* on retire ensuite tous ses sommets adjacents */
+		for(int i=0;i<g->n;i++){
+			if(g->a[tmp_parcour->st][i])
+				tableau_adjacence[i] = 0;
+		}
+		tmp_parcour = tmp_parcour -> suiv;
+	}
+
+	/* on recherche une valeur positive, si on en trouve une cela signifie que
+		 le sous graphe n'est pas maximal puisque nous pouvons ajouter au moins
+		 un sommet au sous-graphe sans perdre sa propriété de sous-graphe desert
+	*/
+
+	for(int i=0;i<g->n;i++)
+	  	if(tableau_adjacence[i])
+				return 0;
+
+	return 1;
 }

@@ -8,3 +8,9 @@ cplx_graph_desert.o: cplx_graph_desert.c
 
 cplx_graph_desert:cplx_graph_desert.o
 	$(CC) -o cplx_graph_desert cplx_graph_desert.o
+
+clean:
+	rm *.o
+
+mr-proper:
+	clean && rm cplx_graph_desert
