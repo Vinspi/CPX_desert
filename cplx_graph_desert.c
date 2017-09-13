@@ -43,7 +43,7 @@ void initGraph(Graph_m *g, int n){
 
 
 /* 	Fonction printGraph : écrit la représentation matricielle du graphe dans un fichier
-	[Param IN]	char *filename : le nom du fichier dans lequel écrire  
+	[Param IN]	char *filename : le nom du fichier dans lequel écrire
 	[Param IN]	Graph_m *g : pointeur vers la structure reprensentant le graphe en mémoire */
 
 void printGraph(char* filename, Graph_m *g){
@@ -62,7 +62,7 @@ void printGraph(char* filename, Graph_m *g){
 
 	for(int t=0; t<g->n+2; t++){
 			fprintf(out, "----");
-	}	
+	}
 
 	for(int i=0; i<g->n; i++){
 		fprintf(out, "\n s%d     | ", i);
@@ -72,7 +72,7 @@ void printGraph(char* filename, Graph_m *g){
 		fprintf(out, "\n");
 		for(int t=0; t<g->n+2; t++){
 			fprintf(out, "----");
-		}	
+		}
 	}
 
 	fclose(out);
@@ -80,28 +80,28 @@ void printGraph(char* filename, Graph_m *g){
 }
 
 
-/*	Fontion loadSource : construit le graphe (representation matricielle) à partir du fichier 
-	[Param IN]	char *filename : le nom du fichier contenant la liste des aretes 
+/*	Fontion loadSource : construit le graphe (representation matricielle) à partir du fichier
+	[Param IN]	char *filename : le nom du fichier contenant la liste des aretes
 	[Param IN]	Graph_m *g : pointeur vers la structure reprensentant le graphe en mémoire */
 
 void loadSource(char* filename, Graph_m *g){
 
 	FILE *source = NULL;
 	source = fopen(filename, "r");
-	
+
 	if(source == NULL)
 		exit(10);
-   
+
 	char nbSt_str[10], nbAr_str[10], from_str[10], to_str[10];
 	int nbSt, nbAr, from, to;
-   
+
 	fscanf(source, "%s %s", nbSt_str, nbAr_str);
-	
+
 	nbSt = atoi(nbSt_str);
 	nbAr = atoi(nbAr_str);
 
 	initGraph(g, nbSt);
-   
+
     printf("Nombre de sommets : %d\n", nbSt);
 	printf("Nombre d'aretes : %d\n", nbAr);
 
@@ -116,24 +116,59 @@ void loadSource(char* filename, Graph_m *g){
 		printf(" %d )\n", to);
 	}
 
-	fclose(source);	
+	fclose(source);
 }
 
 int main(void){
 
 	Graph_m *graph = malloc(sizeof(Graph_m));
- 
+
+	liste sous_graphe_desert = NULL, tmp;
+
+	tmp = malloc(sizeof(liste));
+	tmp->st = 3;
+	tmp->suiv = sous_graphe_desert;
+	sous_graphe_desert = tmp;
+
+	tmp = malloc(sizeof(liste));
+	tmp->st = 2;
+	tmp->suiv = sous_graphe_desert;
+	sous_graphe_desert = tmp;
+
+	tmp = malloc(sizeof(liste));
+	tmp->st = 0;
+	tmp->suiv = sous_graphe_desert;
+	sous_graphe_desert = tmp;
+
 	loadSource("./source_graph", graph);
-	
-	printGraph("./matri_graph", graph);
-	
+
+	//printGraph("./matri_graph", graph);
+
+	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert));
+
+
 	return 0;
 }
 
+/*
+	 permet de verifier si la liste x est un sous graphe désert de g
+	 la fonction renvoie 1 si c'est le cas  sinon
+*/
 
-int verification_graphe_desert(liste x){
+int verification_graphe_desert(Graph_m *g, liste x){
 
+	liste tmp_parcour = x, tmp_parcour2;
+	int resultat = 1;
 
+	while(tmp_parcour != NULL){
+		tmp_parcour2 = tmp_parcour -> suiv;
+		while (tmp_parcour2 != NULL) {
+			if(g->a[tmp_parcour->st][tmp_parcour2->st])
+				resultat = 0;
+			tmp_parcour2 = tmp_parcour2 -> suiv;
+		}
+		tmp_parcour = tmp_parcour -> suiv;
+	}
 
-	return 0;
+	return resultat;
 }
