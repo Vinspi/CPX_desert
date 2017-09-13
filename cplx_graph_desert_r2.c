@@ -27,9 +27,7 @@ typedef maillon *liste;
 typedef struct {
 	int taille;
 	liste lx;
-} couple;
-
-typedef couple *sous_graphe_max;
+} sous_graphe_max;
 
 /*	Fontion initGraphe : initialise les champs de la structure representant le graphe en mémoire
 	[Param IN]	Graph_m *g : pointeur vers la structure reprensentant le graphe en mémoire */
@@ -155,7 +153,7 @@ int verification_graphe_desert(Graph_m *g, liste x){
 
 int verification_maximalite(Graph_m *g, liste x){
 
-	int tableau_adjacence[n_max];
+	int tableau_adjacence[n_max], max = 1;
 	liste tmp_parcour = x;
 
 	/* si ce n'est pas un sous graphe desert de g il ne peut etre maximal */
@@ -182,10 +180,11 @@ int verification_maximalite(Graph_m *g, liste x){
 	*/
 
 	for(int i=0;i<g->n;i++)
-	  	if(tableau_adjacence[i])
-				return 0;
-
-	return 1;
+	  	if(tableau_adjacence[i]){
+			printf("tab[%d] = %d\n",i, tableau_adjacence[i]);
+			max = 0;
+		}
+	return max;
 }
 
 
@@ -279,74 +278,85 @@ liste calcul_maximal(Graph_m *g){
 //__________________________________________________________________
 
 
-sous_graphe_max sommet_degre_min(Graph_m *g){
+void free_liste(liste x){
 
-	sous_graphe_max xs = NULL;
+	while(x != NULL){
+		liste tmp = x;
+		x = x -> suiv;
+		free(tmp);
+	}
+
+}
+
+void sommet_degre_min(Graph_m *g, sous_graphe_max *xs){
+
+	
 	liste x = NULL;
-	int min = 0, imin = -1;
+	int min = n_max, imin = -1;
 	for(int i = 0; i < g->n; i++){
-		if(g->degre[i] > 0 && g->degre[i] < min){
+		
+		if(g->degre[i] > -1 && g->degre[i] < min){
 			imin = i;
 			min = g->degre[i];
+			//free_liste(x);
 			free(x);
-			printf("Là\n");
-			x = add_to_liste(x, imin);
+			x = add_to_liste(x, imin);		
 			xs->taille = 1;
-			printf("Ou ailleurs\n");
 		}
 		if(g->degre[i] == min){
-			x = add_to_liste(x, imin);
-			xs->taille++;
+			x = add_to_liste(x, imin);		
+			xs->taille = (xs->taille) + 1;
 		}
 	}
 	xs->lx = x;
 	return xs;
 }
 
-//Retourne 0 si maximal, 1 sinon.
+//Retourne 1 si maximal, 0 sinon.
 int verif_maximal(Graph_m *g){
+
+	
 	for(int i = 0; i < g->n; i++){
-		if(g->degre[i] > -1) return 1;
+		//if(tab[i] == 1) return 1;		
+		if(g->degre[i] > -1) return 0;
 	}
-	return 0;
+	return 1;
 
 }
-sous_graphe_max calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max sgm){
+sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
 	
-	printf("Appel récursif, %d\n",g->n);
 
 
-	if(verif_maximal(g) == 0){
-		printf("SGM maximum\n");
+	if(verif_maximal(g) == 1){
 		return sgm;
 	}	
-	printf("SGM pas maximum\n");
+	
 
 	/*Choisir le nouveau sommet i*/
-	sous_graphe_max lns = sommet_degre_min(g);
-	printf("Ici ?!\n");
-	liste tmp_parcour = NULL;	
+	sous_graphe_max *lns = malloc(sizeof(sous_graphe_max));
+	sommet_degre_min(g,lns);
+
+
+
 	if (lns->taille == 1){
 		sgm->taille++;
 		sgm->lx = add_to_liste(sgm->lx,lns->lx->st);
 
 		/*Mettre à jour les degrés et l'adjacence*/
 		
-		tmp_parcour = sgm->lx;
-		while (tmp_parcour != NULL) {
+		
+		g->degre[lns->lx->st] = -1;
 			
-			g->degre[tmp_parcour->st] = -1;
-			
-			for(int j=0;j<g->n;j++){
-				if(g->a[tmp_parcour->st][j]){
-					g->degre[j] = -1;
-					for(int z = 0; z < g->n; z++){
-						if(g->a[j][z] == 1) g->degre[z]--;
-					}
+		for(int j=0;j<g->n;j++){
+			if(g->a[lns->lx->st][j]){
+				g->degre[j] = -1;
+				for(int z = 0; z < g->n; z++){
+					if(g->a[j][z] == 1) g->degre[z] = g->degre[z] - 1;
 				}
 			}
-			tmp_parcour = tmp_parcour -> suiv;
 		}
+		
+		
 
 
 		/*Appel récursif*/
@@ -355,27 +365,27 @@ sous_graphe_max calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max sgm){
 	} 
 	else {		//DIVERGENCE
 
-		//Test avec heristique du premier arrivé.
+		//Test avec heuristique du premier arrivé.
 		sgm->taille++;
 		sgm->lx = add_to_liste(sgm->lx,lns->lx->st);
 
 		/*Mettre à jour les degrés et l'adjacence*/
 		
-		tmp_parcour = sgm->lx;
-		while (tmp_parcour != NULL) {
+		
+		
 			
-			g->degre[tmp_parcour->st] = -1;
+		g->degre[lns->lx->st] = -1;
 			
-			for(int j=0;j<g->n;j++){
-				if(g->a[tmp_parcour->st][j]){
-					g->degre[j] = -1;
-					for(int z = 0; z < g->n; z++){
-						if(g->a[j][z] == 1) g->degre[z]--;
-					}
+		for(int j=0;j<g->n;j++){
+			if(g->a[lns->lx->st][j]){
+				g->degre[j] = -1;
+				for(int z = 0; z < g->n; z++){
+					if(g->a[j][z] == 1) g->degre[z] = g->degre[z] - 1;
 				}
 			}
-			tmp_parcour = tmp_parcour -> suiv;
 		}
+			
+	
 
 
 		/*Appel récursif*/
@@ -383,7 +393,7 @@ sous_graphe_max calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max sgm){
 
 	}
 }
-sous_graphe_max calcul_maximum_complet(Graph_m *g){
+sous_graphe_max* calcul_maximum_complet(Graph_m *g){
 	
 	Graph_m *g2 = malloc(sizeof(Graph_m));
 	g2->n = g->n;
@@ -394,11 +404,7 @@ sous_graphe_max calcul_maximum_complet(Graph_m *g){
 		g2->degre[i] = g->degre[i];
 	}
 	
-	sous_graphe_max sgm = NULL;
-	printf("Début du calcul\n");
-	for(int j = 0; j < g->n; j++){
-		printf("%d  /  ",g2->degre[j]);
-	}
+	sous_graphe_max *sgm = malloc(sizeof(sous_graphe_max));
 	return calcul_maximum_complet_rec(g2,sgm);
 }
 
@@ -435,7 +441,7 @@ int main(void){
 	tmp->suiv = sous_graphe_desert;
 	sous_graphe_desert = tmp;*/
 
-	loadSource("./source_graph", graph);
+	loadSource("./anna", graph);
 
 	//printGraph("./matri_graph", graph);
 
@@ -444,9 +450,9 @@ int main(void){
 	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sous_graphe_desert));
 	printf_liste(sous_graphe_desert);*/
 	
-	sous_graphe_max sgm = calcul_maximum_complet(graph);
+	sous_graphe_max *sgm = calcul_maximum_complet(graph);
 	printf_liste(sgm->lx);
-	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sgm->lx));
+
 
 	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sgm->lx));
 	
