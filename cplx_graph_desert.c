@@ -3,10 +3,8 @@
 
 
 /*	Liste des codes d'erreur
-
 	10 : L'ouverture du fichier source a échoué
 	15 : L'ouverture du fichier de sortie à échoué
-
 */
 
 #define n_max 1000
@@ -120,34 +118,43 @@ void loadSource(char* filename, Graph_m *g){
 	fclose(source);
 }
 
-//Affichage liste x.
-void printf_liste(liste x){
+int main(void){
 
-	liste tmp = x;
-	printf("[ ");
-	while(tmp != NULL){
-		printf("%d ",tmp->st);
-		tmp = tmp->suiv;
-	}
-	printf("]\n");
+	Graph_m *graph = malloc(sizeof(Graph_m));
+
+	liste sous_graphe_desert = NULL, tmp;
+
+	tmp = malloc(sizeof(liste));
+	tmp->st = 0;
+	tmp->suiv = sous_graphe_desert;
+	sous_graphe_desert = tmp;
+
+	tmp = malloc(sizeof(liste));
+	tmp->st = 4;
+	tmp->suiv = sous_graphe_desert;
+	sous_graphe_desert = tmp;
+
+	tmp = malloc(sizeof(liste));
+	tmp->st = 2;
+	tmp->suiv = sous_graphe_desert;
+	sous_graphe_desert = tmp;
+
+	loadSource("./source_graph", graph);
+
+	//printGraph("./matri_graph", graph);
+
+	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert));
+
+	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sous_graphe_desert));
+	return 0;
 }
 
-//Ajoute un sommet a à la liste x.
-liste add_to_liste(liste x, sommet a){
-	liste tmp = malloc(sizeof(liste));
-	tmp->st = a;
-	tmp->suiv = x;
-	return tmp;
-}
-
-
-
-
-
-
+/*
+	 permet de verifier si la liste x est un sous graphe désert de g
+	 la fonction renvoie 1 si c'est le cas  sinon.
+*/
 
 int verification_graphe_desert(Graph_m *g, liste x){
-
 
 	liste tmp_parcour = x, tmp_parcour2;
 	int resultat = 1;
@@ -165,71 +172,42 @@ int verification_graphe_desert(Graph_m *g, liste x){
 	return resultat;
 }
 
+/*
+	permet de verifier la maximalité d'un sous graphe désert de g
+	la fonction renvoie 1 si le ous graphe passé en parametre est maximal et 0 sinon.
+*/
 
-
-//Approche par tableau.
-void generer_tableau_all(Graph_m *g, int* tab){
-	for(int i = 0; i < g->n; i++){
-		tab[i] = 1;
-	}
-
-}
-
-
-void retirer_adjacence(Graph_m *g, liste x, int* tab){
-	liste tmp = x;
-	while(tmp != NULL){
-		tab[tmp->st] = 0;					//Retrait des sommets de la liste.
-		for(int i = 0; i < g->n; i++){
-			if(g->a[tmp->st][i] == 1) tab[i] = 0;		//Retrait des sommets adjacents aux sommets de la liste
-		}
-		tmp = tmp->suiv;
-	}
-}
-
-//Retourne 0 si la l'adjancence est nulle, 1 sinon.
-int verif_all(Graph_m *g, int* tab){
-
-	for(int i = 0; i < g->n; i++){
-		if(tab[i] == 1) return 1;
-	}
-	return 0;
-
-}
-
-//Retourne 0 si maximal, 1 sinon.
 int verification_maximalite(Graph_m *g, liste x){
-	int all[n_max]; 
-	generer_tableau_all(g, all);
-	
-	retirer_adjacence(g, x, all);
-	return verif_all(g, all);
 
+	int tableau_adjacence[n_max];
+	liste tmp_parcour = x;
+
+	/* si ce n'est pas un sous graphe desert de g il ne peut etre maximal */
+	if(!verification_graphe_desert(g,x))
+		return 0;
+
+		for(int i=0;i<g->n;i++)
+			tableau_adjacence[i] = 1;
+
+	while (tmp_parcour != NULL) {
+		/* on retire le sommet courant des adjacents */
+		tableau_adjacence[tmp_parcour->st] = 0;
+		/* on retire ensuite tous ses sommets adjacents */
+		for(int i=0;i<g->n;i++){
+			if(g->a[tmp_parcour->st][i])
+				tableau_adjacence[i] = 0;
+		}
+		tmp_parcour = tmp_parcour -> suiv;
+	}
+
+	/* on recherche une valeur positive, si on en trouve une cela signifie que
+		 le sous graphe n'est pas maximal puisque nous pouvons ajouter au moins
+		 un sommet au sous-graphe sans perdre sa propriété de sous-graphe desert
+	*/
+
+	for(int i=0;i<g->n;i++)
+	  	if(tableau_adjacence[i])
+				return 0;
+
+	return 1;
 }
-
-
-
-
-int main(void){
-
-	Graph_m *graph = malloc(sizeof(Graph_m));
- 
-	loadSource("./source_graph", graph);
-	
-	//printGraph("./matri_graph", graph);
-	
-	liste x;
-	x = add_to_liste(x, 0);
-	x = add_to_liste(x, 2);
-	x = add_to_liste(x, 4);	
-	//x = add_to_liste(x, 3);
-	printf_liste(x);
-
-	if(verification_graphe_desert(graph, x) == 1) printf("x est un sous-graphe desert de g\n");
-	else printf("x n'est pas un sous-graphe desert de g\n");
-
-	printf("%d\n",verification_maximalite(graph, x));
-
-	return 0;
-}
-
