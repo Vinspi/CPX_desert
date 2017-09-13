@@ -110,6 +110,7 @@ void loadSource(char* filename, Graph_m *g){
 		to = atoi(to_str);
 
 		g->a[from][to] = 1;
+		g->a[to][from] = 1;
 		g->degre[from] = g->degre[from] + 1;
 
 		printf("( %d,", from);
@@ -126,17 +127,17 @@ int main(void){
 	liste sous_graphe_desert = NULL, tmp;
 
 	tmp = malloc(sizeof(liste));
-	tmp->st = 3;
+	tmp->st = 0;
+	tmp->suiv = sous_graphe_desert;
+	sous_graphe_desert = tmp;
+
+	tmp = malloc(sizeof(liste));
+	tmp->st = 4;
 	tmp->suiv = sous_graphe_desert;
 	sous_graphe_desert = tmp;
 
 	tmp = malloc(sizeof(liste));
 	tmp->st = 2;
-	tmp->suiv = sous_graphe_desert;
-	sous_graphe_desert = tmp;
-
-	tmp = malloc(sizeof(liste));
-	tmp->st = 0;
 	tmp->suiv = sous_graphe_desert;
 	sous_graphe_desert = tmp;
 
@@ -171,4 +172,9 @@ int verification_graphe_desert(Graph_m *g, liste x){
 	}
 
 	return resultat;
+}
+
+int verification_maximalite(Graph_m *g, liste x){
+
+	return 0;
 }
