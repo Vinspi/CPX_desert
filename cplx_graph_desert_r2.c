@@ -181,7 +181,7 @@ int verification_maximalite(Graph_m *g, liste x){
 
 	for(int i=0;i<g->n;i++)
 	  	if(tableau_adjacence[i]){
-			printf("tab[%d] = %d\n",i, tableau_adjacence[i]);
+			//printf("tab[%d] = %d\n",i, tableau_adjacence[i]);
 			max = 0;
 		}
 	return max;
@@ -291,25 +291,25 @@ void free_liste(liste x){
 void sommet_degre_min(Graph_m *g, sous_graphe_max *xs){
 
 
-    liste x = NULL;
-    int min = n_max+1, imin = -1;
-    for(int i = 0; i < g->n; i++){
+	liste x = NULL;
+	int min = n_max+1, imin = -1;
+	for(int i = 0; i < g->n; i++){
 
-        if(g->degre[i] > -1 && g->degre[i] < min){
-            imin = i;
-            min = g->degre[i];
-            //free_liste(x);
-            free(x);
-            x = add_to_liste(x, imin);
-            xs->taille = 1;
-        }
-        if(g->degre[i] == min){
-            x = add_to_liste(x, imin);
-            xs->taille = (xs->taille) + 1;
-        }
-    }
+		if(g->degre[i] > -1 && g->degre[i] < min){
+			imin = i;
+			min = g->degre[i];
+			//free_liste(x);
+			free(x);
+			x = add_to_liste(x, imin);
+			xs->taille = 1;
+		}
+		if(g->degre[i] == min){
+			x = add_to_liste(x, imin);
+			xs->taille = (xs->taille) + 1;
+		}
+	}
 
-    xs->lx = x;
+	xs->lx = x;
 }
 
 //Retourne 1 si maximal, 0 sinon.
@@ -336,7 +336,7 @@ sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
 	sous_graphe_max *lns = malloc(sizeof(sous_graphe_max));
 	sommet_degre_min(g,lns);
 
-
+	//if(lns == NULL) return sgm;
 
 	if (lns->taille == 1){
 		sgm->taille++;
@@ -441,7 +441,7 @@ int main(void){
 	tmp->suiv = sous_graphe_desert;
 	sous_graphe_desert = tmp;*/
 
-	loadSource("./graph/Benchs/anna", graph);
+	loadSource("./anna", graph);
 
 	//printGraph("./matri_graph", graph);
 
