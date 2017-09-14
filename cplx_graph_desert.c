@@ -147,9 +147,11 @@ int main(void){
 
 
 	sous_graphe_desert = sous_graphe_maximal(graph, sous_graphe_desert);
-
+	
 	printf_liste(sous_graphe_desert);
+	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sous_graphe_desert));
 
+	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sous_graphe_desert));
 	sous_graphe_desert_maximal = sous_graphe_maximal_incomplete(graph, sous_graphe_desert_maximal);
 
 	printf_liste(sous_graphe_desert_maximal);
