@@ -241,25 +241,25 @@ liste calcul_maximal(Graph_m *g){
 
 
 	int all[n_max], i = 0;
-	generer_tableau_all(g, all);	
-	
+	generer_tableau_all(g, all);
+
 
 	liste x = NULL;
 	/*On prend 0 par défaut.
 	x = add_to_liste(x, 0);*/
 	liste tmp_parcour = x;
-	while(verif_all(g, all) != 0){	
+	while(verif_all(g, all) != 0){
 		i = 0;
-		
+
 		/*Choisir le nouveau sommet i*/
 		while(i < g->n && all[i] == 0){
 			i++;
 		}
-		
+
 		x = add_to_liste(x, i);
-		
-		
-		
+
+
+
 		tmp_parcour = x;
 		/*Retirer l'adjacence*/
 		while (tmp_parcour != NULL) {
@@ -272,7 +272,7 @@ liste calcul_maximal(Graph_m *g){
 			}
 			tmp_parcour = tmp_parcour -> suiv;
 		}
-		
+
 
 
 	}
@@ -300,14 +300,15 @@ void free_liste(liste x){
 
 void sommet_degre_min(Graph_m *g, sous_graphe_max *xs){
 
-	
+
 	liste x = NULL;
 	int min = n_max, imin = -1;
 	for(int i = 0; i < g->n; i++){
-		
+
 		if(g->degre[i] > -1 && g->degre[i] < min){
 			imin = i;
 			min = g->degre[i];
+<<<<<<< HEAD
 			free_liste(x);
 			//if(x != NULL) free(x);
 			x = add_to_liste(x, imin);		
@@ -315,6 +316,15 @@ void sommet_degre_min(Graph_m *g, sous_graphe_max *xs){
 		}
 		/*if(g->degre[i] == min){
 			x = add_to_liste(x, imin);		
+=======
+			//free_liste(x);
+			free(x);
+			x = add_to_liste(x, imin);
+			xs->taille = 1;
+		}
+		if(g->degre[i] == min){
+			x = add_to_liste(x, imin);
+>>>>>>> 9f63778cb00fb1e6cba921210505281efcef92cc
 			xs->taille = (xs->taille) + 1;
 		}*/
 	}
@@ -346,7 +356,7 @@ int sommet_degre_min_safe(Graph_m *g, sous_graphe_max *xs){
 		} 
 
 	}
-	
+
 	xs->lx = x;
 	if (allsame == 1) return -1;
 	return min;
@@ -356,16 +366,16 @@ int sommet_degre_min_safe(Graph_m *g, sous_graphe_max *xs){
 //Retourne 1 si maximal, 0 sinon.
 int verif_maximal(Graph_m *g){
 
-	
+
 	for(int i = 0; i < g->n; i++){
-		//if(tab[i] == 1) return 1;		
+		//if(tab[i] == 1) return 1;
 		if(g->degre[i] > -1) return 0;
 	}
 	return 1;
 
 }
 sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
-	
+
 
 	/*Copie du graph g
 	Graph_m *g2 = malloc(sizeof(Graph_m));
@@ -380,8 +390,13 @@ sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
 
 	/*if(verif_maximal(g) == 1){
 		return sgm;
+<<<<<<< HEAD
 	}/*	
 	
+=======
+	}
+
+>>>>>>> 9f63778cb00fb1e6cba921210505281efcef92cc
 
 	/*Choisir le nouveau sommet i*/
 	sous_graphe_max *lns = malloc(sizeof(sous_graphe_max));
@@ -400,10 +415,10 @@ sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
 		sgm->lx = add_to_liste(sgm->lx,lns->lx->st);
 
 		/*Mettre à jour les degrés et l'adjacence*/
-		
-		
+
+
 		g->degre[lns->lx->st] = -1;
-			
+
 		for(int j=0;j<g->n;j++){
 			if( g->a[sgm->lx->st][j] == 1 && g->degre[j] > -1){
 				g->degre[j] = -1;
@@ -415,12 +430,18 @@ sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
 				}
 			}
 		}
+<<<<<<< HEAD
 		
+=======
+
+
+
+>>>>>>> 9f63778cb00fb1e6cba921210505281efcef92cc
 
 		/*Appel récursif*/
 		return calcul_maximum_complet_rec(g,sgm);
-		
-	} 
+
+	}
 	else {		//DIVERGENCE
 
 		//Test avec heuristique du premier arrivé.
@@ -428,11 +449,15 @@ sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
 		sgm->lx = add_to_liste(sgm->lx,lns->lx->st);
 
 		/*Mettre à jour les degrés et l'adjacence*/
-		
-		
-		
-			
+
+
+
+
 		g->degre[lns->lx->st] = -1;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f63778cb00fb1e6cba921210505281efcef92cc
 		for(int j=0;j<g->n;j++){
 			if(g->a[sgm->lx->st][j] == 1 && g->degre[j] > -1){
 				g->degre[j] = -1;
@@ -443,8 +468,14 @@ sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
 					}
 				}
 			}
+<<<<<<< HEAD
 		}	
 		
+=======
+		}
+
+
+>>>>>>> 9f63778cb00fb1e6cba921210505281efcef92cc
 
 
 		/*Appel récursif*/
@@ -453,17 +484,17 @@ sous_graphe_max* calcul_maximum_complet_rec(Graph_m *g, sous_graphe_max *sgm){
 	}
 }
 sous_graphe_max* calcul_maximum_complet(Graph_m *g){
-	
+
 	Graph_m *g2 = malloc(sizeof(Graph_m));
 	g2->n = g->n;
 	for(int i = 0; i < g->n; i++){
-		for(int j = 0; j < g->n; j++){		
+		for(int j = 0; j < g->n; j++){
 			g2->a[i][j] = g->a[i][j];
 		}
 		g2->degre[i] = g->degre[i];
 		//printf("g->degre[%d] = %d\n",i,g->degre[i]);
 	}
-	
+
 	sous_graphe_max *sgm = malloc(sizeof(sous_graphe_max));
 	return calcul_maximum_complet_rec(g2,sgm);
 }
@@ -695,7 +726,7 @@ int main(void){
 	Graph_m *graph = malloc(sizeof(Graph_m));
 
 	liste sous_graphe_desert = NULL, tmp;
-	
+
 	/*tmp = malloc(sizeof(liste));
 	tmp->st = 0;
 	tmp->suiv = sous_graphe_desert;
@@ -723,8 +754,13 @@ int main(void){
 
 	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sous_graphe_desert));
 	printf_liste(sous_graphe_desert);*/
+<<<<<<< HEAD
 	
 	/*sous_graphe_max *sgm = calcul_maximum_complet(graph);
+=======
+
+	sous_graphe_max *sgm = calcul_maximum_complet(graph);
+>>>>>>> 9f63778cb00fb1e6cba921210505281efcef92cc
 	printf_liste(sgm->lx);
 
 	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, sgm->lx));
@@ -733,11 +769,16 @@ int main(void){
 	sous_graphe_max *vsgm = vcalcul_maximum_complet(graph);
 	printf_liste(vsgm->lx);
 
+<<<<<<< HEAD
 	printf("sous graphe desert ? %d\n", verification_graphe_desert(graph, vsgm->lx));
 	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, vsgm->lx));
 	
 	
+=======
+	printf("sous graphe maximal ? %d\n", verification_maximalite(graph, sgm->lx));
+
+
+>>>>>>> 9f63778cb00fb1e6cba921210505281efcef92cc
 
 	return 0;
 }
-
