@@ -369,7 +369,7 @@ sous_graphe_max* calcul_maximum_exact(Graph *g){
 
 int main(int argc, char *argv[]){
 
-    if(argc != 1){
+    if(argc != 2){
       printf("USAGE : ./calcul_maximum_exact fichier_contenant_le_graphe\n");
       exit(-1);
     }
@@ -381,11 +381,11 @@ int main(int argc, char *argv[]){
     char* fgraph = argv[1];
     loadSource(fgraph, graph);
 
-    
+
 
     //Résultat :
     liste X = calcul_maximum_exact(graph)->lx;
-    printf("Le sous-graphe maximum approché généré est :\n");
+    printf("Le sous-graphe maximum exact généré est :\n");
     printf_liste(X);
 
 
