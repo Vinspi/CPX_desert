@@ -23,7 +23,6 @@ int sommets_degre_min(Graph *g, int degre[], sous_graphe_max *xs){
 
 	for(int i = 0; i < g->n; i++){
 		if(degre[i] == min){
-			//printf("Ajout de %d\n",i);
 			x = add_to_liste(x, i);
 			xs->taille = (xs->taille) + 1;
 		}
@@ -46,6 +45,8 @@ sous_graphe_max* calcul_maximum_exact_rec(Graph *g, int degre[], sous_graphe_max
 
 	/*Choisir le nouveau sommet i*/
 	sous_graphe_max *lns = malloc(sizeof(sous_graphe_max));
+	lns->lx = NULL;
+	lns->taille = 0;
 	int d = sommets_degre_min(g,degre,lns);
 
 
@@ -150,6 +151,8 @@ sous_graphe_max* calcul_maximum_exact_rec(Graph *g, int degre[], sous_graphe_max
 
 				//Copie du sous-ensemble de sommets courant : ici aussi, on crée une instance par possibilité pour la divergence (sinon structures partagées).
 				sous_graphe_max* tmp = malloc(sizeof(sous_graphe_max));
+				tmp->lx = NULL;
+				tmp->taille = 0;
 				liste ltmp = sgm->lx;
 				while(ltmp != NULL){
 					tmp->lx = add_to_liste(tmp->lx,ltmp->st);
@@ -202,6 +205,8 @@ sous_graphe_max* calcul_maximum_exact(Graph *g){
 
 
   	sous_graphe_max *sgm = malloc(sizeof(sous_graphe_max));
+		sgm->lx = NULL;
+		sgm->taille = 0;
 
   	return calcul_maximum_exact_rec(g,copie_degre,sgm);
 }
