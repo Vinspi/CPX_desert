@@ -91,16 +91,7 @@ sous_graphe_max* calcul_maximum_exact_rec(Graph *g, int degre[], sous_graphe_max
 			while(lns->lx != NULL){
 				sgm->lx = add_to_liste(sgm->lx,lns->lx->st);
 				degre[lns->lx->st] = -1;
-				for(int j=0;j<g->n;j++){
-					if(g->a[lns->lx->st][j] == 1 && degre[j] > -1){
-						degre[j] = -1;
-						for(int z = 0; z < g->n; z++){
-							if(g->a[j][z] == 1){
-								(degre[z])--;
-							}
-						}
-					}
-				}
+				//Partie supprimée parce qu'inutile.
 				lns->lx=lns->lx->suiv;
 
 			}
